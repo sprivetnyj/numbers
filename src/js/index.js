@@ -38,6 +38,11 @@ const elmPost = document.querySelector('.post');
 const elmInvite = document.querySelector('.invite');
 const elmVolume = document.querySelector('.volume');
 
+const elmHome = document.querySelector('.home');
+const elmRestart = document.querySelector('.restart');
+
+const elmLvl = document.querySelector('.lvl span');
+
 const preloader = document.querySelector('.preloader');
 
 //================================================================================
@@ -70,6 +75,12 @@ preloader.classList.add('hidden');
 // 		})
 // });
 
+const taps = ['Tap1', 'Tap2', 'Tap3', 'Tap4', 'Tap5', 'Tap6', 'Tap7', 'Tap8'];
+
+// a b c d e f g h i j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z
+// 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+const digits = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+
 //================================================================================
 
 // setInterval(() => {
@@ -91,10 +102,14 @@ let numbersAim;
 // Массив всех отмеченных ячеек
 let numbersArray;
 
-createLvl();
+let tap;
 
-function createLvl() {
-	const tiles = map[lvl].replace(/\r?\n/g, '').trim();
+createLvl(lvl);
+
+function createLvl(number) {
+	tap = 0;
+	elmLvl.textContent = number + 1;
+	const tiles = map[number].replace(/\r?\n/g, '').trim();
 	let tilesRows = 0;
 
 	for (let tile of tiles) {
@@ -119,7 +134,7 @@ function createLvl() {
 			let number = '';
 			let status = '';
 			if (tile !== '+' && tile !== '-') {
-				tile = Number(tile);
+				tile = digits.indexOf(tile) + 1;
 				number = tile;
 				if (tile === 1) {
 					status = 'start active';
@@ -192,14 +207,15 @@ document.addEventListener('click', (e) => {
 	// 	if (volume) audio.Click.play();
 	// 	newScreen(elmScreenStart);
 	// } 
+	else if (el === elmRestart) {
+		elmGrid.remove();
+		createLvl(lvl);
+	}
 	else if (el === elmVolume) {
 		volume = !volume;
 		elmVolume.classList.toggle('off');
-	} else {
-
 	}
 	if (el.closest('button')) {
-		vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 		animState([el.closest('button')], 200, 'scale');
 		if (volume) audio.Click.play();
 	}
@@ -256,7 +272,6 @@ function move(e) {
 								}
 								setTimeout(() => {
 									if (!lvlComplete) {
-										vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "medium" });
 										confetti({
 											particleCount: 50,
 											decay: scale / 1.5,
@@ -288,8 +303,10 @@ function move(e) {
 							}
 						} else {
 							if (numberLock) {
-								addNumber();
-								el.textContent = numbers;
+								if (!numbersArray[numbersArray.length - 1].classList.contains('completed')) {
+									addNumber();
+									el.textContent = numbers;
+								}
 							} else {
 								out();
 							}
@@ -302,6 +319,10 @@ function move(e) {
 			// Если вернулись на предыдущий элемент по порядку
 			if (el.classList.contains('active')) {
 				if (numbers - 1 == el.textContent) {
+					if (volume) {
+						if (tap > 0) tap--;
+						// audio[taps[tap]].play();
+					}
 					elmGridItems.forEach(elmGridItem => {
 						if (elmGridItem.textContent == numbers) {
 							// Если до этого был элемент, который был равен конечному
@@ -324,6 +345,8 @@ function move(e) {
 			}
 			if (elmGrid.querySelectorAll('.active').length >= numbersAim) {
 				if (!lvlComplete) {
+					toggleClasses([elmHome, elmRestart], 'add', ['hidden']);
+					if (volume) audio.Confetti.play();
 					lvl++;
 					setTimeout(() => {
 						if (isMobile.any()) {
@@ -331,10 +354,12 @@ function move(e) {
 						} else {
 							document.removeEventListener('mousemove', move);
 						}
+						toggleClasses([elmHome, elmRestart], 'remove', ['hidden']);
 						elmGrid.remove();
-						createLvl();
+						createLvl(lvl);
 						lvlComplete = false;
 					}, 2000);
+
 					lvlComplete = true;
 					const colors = ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'];
 					confetti({
@@ -353,7 +378,6 @@ function move(e) {
 						origin: { x: 1, y: 0.6 },
 						colors: colors
 					});
-					vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "heavy" });
 				}
 			}
 		} else {
@@ -366,6 +390,12 @@ function move(e) {
 
 // Создание новой цифры
 function addNumber() {
+	vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
+	if (volume) {
+		// audio[taps[tap]].play();
+		// Пока есть элементы в массиве
+		if (tap < 9) tap++;
+	}
 	// Проверка стороны нового элемента
 	if (currentEl.y > prevEl.y) el.classList.add('top');
 	if (currentEl.y < prevEl.y) el.classList.add('bottom');
@@ -381,6 +411,7 @@ function addNumber() {
 // При неверной позиции, выходе за сетку или при отпускании пальца/курсора
 function out() {
 	if (!lvlComplete) {
+		tap = 0;
 		numberLock = true;
 		numbers = 1;
 		numbersArray.forEach(numberItem => {

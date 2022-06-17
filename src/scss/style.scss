@@ -80,16 +80,20 @@ body {
 .lvl {
 	position: absolute;
 	top: 15px;
-	right: 15px;
+	left: 50%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	min-width: 56px;
-	min-height: 56px;
+	min-height: 42px;
 	padding: 0 20px;
-	font-size: 28px;
+	font-size: 20px;
 	color: var(--color-blue);
 	background-color: #fff;
+	transform: translateX(-50%);
+	span {
+		margin-left: 5px;
+	}
 }
 
 .grid {
@@ -117,8 +121,10 @@ body {
 			}
 		}
 		&.start {
-			cursor: pointer;
 			background-color: var(--color-blue);
+			&:not(.completed) {
+				cursor: pointer;
+			}
 		}
 		&.end {
 			background-color: var(--color-purple);
@@ -230,11 +236,19 @@ body {
 }
 
 .home {
-	top: 15px;
+	bottom: 15px;
 	left: 15px;
-	background-size: 70%;
-	background-position: top 35% center;
+	background-size: 80%;
+	background-position: top 45% center;
 	background-image: url("../img/home.svg");
+}
+
+.restart {
+	bottom: 15px;
+	right: 15px;
+	// background-size: 70%;
+	// background-position: top 35% center;
+	background-image: url("../img/restart.svg");
 }
 
 .group {
