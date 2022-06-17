@@ -316,29 +316,28 @@ function move(e) {
 			}
 			// Если вернулись на предыдущий элемент по порядку
 			if (el.classList.contains('active')) {
-				if (numbers - 1 == el.textContent) {
-					if (el.classList.contains('end')) {
-						vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "heavy" });
-					} else {
-						vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
-					}
-					elmGridItems.forEach(elmGridItem => {
-						if (elmGridItem.textContent == numbers) {
-							// Если до этого был элемент, который был равен конечному
-							if (numbersArray.includes(elmGridItem)) {
-								setTimeout(() => {
-									numbers--;
-									numberLock = true;
-									// Убираем все возможные классы границ
-									elmGridItem.classList.remove('active', 'top', 'left', 'right', 'bottom');
-									numbersArray.splice(numbersArray.indexOf(elmGridItem), 1);
-									// Обнуляем текст, если не на конечном элементе
-									if (!elmGridItem.classList.contains('end')) elmGridItem.textContent = '';
-								}, 1);
+				if (!el.classList.contains('completed')) {
+					if (numbers - 1 == el.textContent) {
+						elmGridItems.forEach(elmGridItem => {
+							if (elmGridItem.textContent == numbers) {
+								// Если до этого был элемент, который был равен конечному
+								if (numbersArray.includes(elmGridItem)) {
+									setTimeout(() => {
+										numbers--;
+										numberLock = true;
+										// Убираем все возможные классы границ
+										elmGridItem.classList.remove('active', 'top', 'left', 'right', 'bottom');
+										numbersArray.splice(numbersArray.indexOf(elmGridItem), 1);
+										// Обнуляем текст, если не на конечном элементе
+										if (!elmGridItem.classList.contains('end')) elmGridItem.textContent = '';
+									}, 1);
+								}
 							}
-						}
-					});
-				} else if (numbers > el.textContent) {
+						});
+					} else if (numbers > el.textContent) {
+						out();
+					}
+				} else {
 					out();
 				}
 			}
@@ -358,7 +357,6 @@ function move(e) {
 						createLvl(lvl);
 						lvlComplete = false;
 					}, 2000);
-
 					lvlComplete = true;
 					const colors = ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'];
 					confetti({
@@ -389,11 +387,7 @@ function move(e) {
 
 // Создание новой цифры
 function addNumber() {
-	if (el.classList.contains('end')) {
-		vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "heavy" });
-	} else {
-		vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
-	}
+	vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 	// Проверка стороны нового элемента
 	if (currentEl.y > prevEl.y) el.classList.add('top');
 	if (currentEl.y < prevEl.y) el.classList.add('bottom');
