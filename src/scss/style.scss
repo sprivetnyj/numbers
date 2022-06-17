@@ -114,12 +114,12 @@ body {
 		align-items: center;
 		font-size: var(--size);
 		background-color: var(--color-white);
-		&.delay {
-			transition: background-color 0.2s;
-			&::before {
-				transition: background-color 0.2s;
-			}
-		}
+		// &.delay {
+		// 	transition: background-color 0.2s;
+		// 	&::before {
+		// 		transition: background-color 0.2s;
+		// 	}
+		// }
 		&.start {
 			background-color: var(--color-blue);
 			&:not(.completed) {
@@ -135,12 +135,12 @@ body {
 		&.hidden {
 			background-color: transparent;
 		}
-		&.error {
-			background-color: #ffe601;
-			&::before {
-				background-color: #ffe601;
-			}
-		}
+		// &.error {
+		// 	background-color: #ffe601;
+		// 	&::before {
+		// 		background-color: #ffe601;
+		// 	}
+		// }
 		&::after {
 			content: "";
 			position: absolute;

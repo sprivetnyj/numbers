@@ -102,12 +102,9 @@ let numbersAim;
 // Массив всех отмеченных ячеек
 let numbersArray;
 
-let tap;
-
 createLvl(lvl);
 
 function createLvl(number) {
-	tap = 0;
 	elmLvl.textContent = number + 1;
 	const tiles = map[number].replace(/\r?\n/g, '').trim();
 	let tilesRows = 0;
@@ -289,15 +286,16 @@ function move(e) {
 								}, 1);
 							} else {
 								if (numberLock) {
-									numbersArray.forEach(number => {
-										number.classList.add('error', 'delay');
-										setTimeout(() => {
-											number.classList.remove('error');
-										}, 200);
-										setTimeout(() => {
-											number.classList.remove('delay');
-										}, 400);
-									});
+									out();
+									// numbersArray.forEach(number => {
+									// 	number.classList.add('error', 'delay');
+									// 	setTimeout(() => {
+									// 		number.classList.remove('error');
+									// 	}, 200);
+									// 	setTimeout(() => {
+									// 		number.classList.remove('delay');
+									// 	}, 400);
+									// });
 								}
 								numberLock = false;
 							}
@@ -319,9 +317,10 @@ function move(e) {
 			// Если вернулись на предыдущий элемент по порядку
 			if (el.classList.contains('active')) {
 				if (numbers - 1 == el.textContent) {
-					if (volume) {
-						if (tap > 0) tap--;
-						// audio[taps[tap]].play();
+					if (el.classList.contains('end')) {
+						vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "heavy" });
+					} else {
+						vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 					}
 					elmGridItems.forEach(elmGridItem => {
 						if (elmGridItem.textContent == numbers) {
@@ -390,11 +389,10 @@ function move(e) {
 
 // Создание новой цифры
 function addNumber() {
-	vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
-	if (volume) {
-		// audio[taps[tap]].play();
-		// Пока есть элементы в массиве
-		if (tap < 9) tap++;
+	if (el.classList.contains('end')) {
+		vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "heavy" });
+	} else {
+		vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 	}
 	// Проверка стороны нового элемента
 	if (currentEl.y > prevEl.y) el.classList.add('top');
@@ -411,12 +409,11 @@ function addNumber() {
 // При неверной позиции, выходе за сетку или при отпускании пальца/курсора
 function out() {
 	if (!lvlComplete) {
-		tap = 0;
 		numberLock = true;
 		numbers = 1;
-		numbersArray.forEach(numberItem => {
-			numberItem.classList.remove('error');
-		});
+		// numbersArray.forEach(numberItem => {
+		// 	numberItem.classList.remove('error');
+		// });
 		numbersArray = [];
 		if (isMobile.any()) {
 			document.removeEventListener('touchmove', move);
