@@ -269,9 +269,10 @@ function move(e) {
 								}
 								setTimeout(() => {
 									if (!lvlComplete) {
+										console.log(true);
 										confetti({
 											particleCount: 50,
-											decay: scale / 1.5,
+											decay: scale / 2,
 											ticks: 40,
 											spread: 360,
 											gravity: 0,
@@ -287,15 +288,6 @@ function move(e) {
 							} else {
 								if (numberLock) {
 									out();
-									// numbersArray.forEach(number => {
-									// 	number.classList.add('error', 'delay');
-									// 	setTimeout(() => {
-									// 		number.classList.remove('error');
-									// 	}, 200);
-									// 	setTimeout(() => {
-									// 		number.classList.remove('delay');
-									// 	}, 400);
-									// });
 								}
 								numberLock = false;
 							}
@@ -346,17 +338,19 @@ function move(e) {
 					toggleClasses([elmHome, elmRestart], 'add', ['hidden']);
 					if (volume) audio.Confetti.play();
 					lvl++;
-					setTimeout(() => {
-						if (isMobile.any()) {
-							document.removeEventListener('touchmove', move);
-						} else {
-							document.removeEventListener('mousemove', move);
-						}
-						toggleClasses([elmHome, elmRestart], 'remove', ['hidden']);
-						elmGrid.remove();
-						createLvl(lvl);
-						lvlComplete = false;
-					}, 2000);
+					if (lvl < 36) {
+						setTimeout(() => {
+							if (isMobile.any()) {
+								document.removeEventListener('touchmove', move);
+							} else {
+								document.removeEventListener('mousemove', move);
+							}
+							toggleClasses([elmHome, elmRestart], 'remove', ['hidden']);
+							elmGrid.remove();
+							createLvl(lvl);
+							lvlComplete = false;
+						}, 2000);
+					}
 					lvlComplete = true;
 					const colors = ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'];
 					confetti({

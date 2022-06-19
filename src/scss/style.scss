@@ -84,7 +84,7 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-width: 56px;
+	min-width: 200px;
 	min-height: 42px;
 	padding: 0 20px;
 	font-size: 20px;
@@ -105,7 +105,7 @@ body {
 	display: grid;
 	grid-template-columns: repeat(var(--columns), 1fr);
 	grid-template-rows: repeat(var(--rows), 1fr);
-	transform: translate(-50%, -50%);
+	transform: translate(-50%, calc(-50% - 9px));
 	// .grid__item
 	&__item {
 		position: relative;
@@ -114,12 +114,6 @@ body {
 		align-items: center;
 		font-size: var(--size);
 		background-color: var(--color-white);
-		// &.delay {
-		// 	transition: background-color 0.2s;
-		// 	&::before {
-		// 		transition: background-color 0.2s;
-		// 	}
-		// }
 		&.start {
 			background-color: var(--color-blue);
 			&:not(.completed) {
@@ -135,12 +129,6 @@ body {
 		&.hidden {
 			background-color: transparent;
 		}
-		// &.error {
-		// 	background-color: #ffe601;
-		// 	&::before {
-		// 		background-color: #ffe601;
-		// 	}
-		// }
 		&::after {
 			content: "";
 			position: absolute;
@@ -195,8 +183,8 @@ body {
 
 .icon {
 	position: absolute;
-	width: 56px;
-	height: 56px;
+	width: 60px;
+	height: 60px;
 	background-color: var(--color-blue);
 	background-position: center;
 	background-repeat: no-repeat;
