@@ -54,11 +54,11 @@ let ad = -1;
 let lvl;
 let userHelp;
 
-vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey0', 'helpKey0'] })
+vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1', 'helpKey1'] })
 	.then(data => {
 		console.log(data);
 		if (!data.keys[0].value.length) data.keys[0].value = '0';
-		if (!data.keys[1].value.length) data.keys[0].value = '3';
+		if (!data.keys[1].value.length) data.keys[1].value = '3';
 		console.log(data);
 		lvl = data.keys[0].value;
 		userHelp = data.keys[1].value;
@@ -250,10 +250,10 @@ document.addEventListener('click', (e) => {
 			}
 			elmHint.firstElementChild = userHelp;
 
-			vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey0'] })
+			vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
 				.then(() => {
 					// Записываем подсказки в ключ хранилища
-					vkBridge.send('VKWebAppStorageSet', { key: 'helpKey0', value: helpKey });
+					vkBridge.send('VKWebAppStorageSet', { key: 'helpKey1', value: helpKey });
 				});
 
 			for (let i = 0; i < paths[index].length; i++) {
@@ -279,10 +279,10 @@ document.addEventListener('click', (e) => {
 						.then(() => {
 							userHelp = 3;
 
-							vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey0'] })
+							vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
 								.then(() => {
 									// Записываем подсказки в ключ хранилища
-									vkBridge.send('VKWebAppStorageSet', { key: 'helpKey0', value: String(userHelp) });
+									vkBridge.send('VKWebAppStorageSet', { key: 'helpKey1', value: String(userHelp) });
 								})
 
 							toggleClasses([elmHint], 'remove', ['show', 'error'], 0);
@@ -479,10 +479,10 @@ function lvlEnd() {
 			if (volume) audio.Confetti.play();
 			lvl++;
 			setTimeout(() => {
-				vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey0'] })
+				vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1'] })
 					.then(() => {
 						// Записываем рекорд в ключ хранилища
-						vkBridge.send('VKWebAppStorageSet', { key: 'lvlKey0', value: String(lvl) });
+						vkBridge.send('VKWebAppStorageSet', { key: 'lvlKey1', value: String(lvl) });
 					});
 				if (isMobile.any()) {
 					document.removeEventListener('touchmove', move);
