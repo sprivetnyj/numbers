@@ -56,8 +56,10 @@ let userHelp;
 
 vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey0', 'helpKey0'] })
 	.then(data => {
+		console.log(data);
 		if (!data.keys[0].value.length) data.keys[0].value = '0';
 		if (!data.keys[1].value.length) data.keys[0].value = '3';
+		console.log(data);
 		lvl = data.keys[0].value;
 		userHelp = data.keys[1].value;
 		setTimeout(() => {
@@ -213,7 +215,7 @@ document.addEventListener('click', (e) => {
 	} else if (el === elmGroup) {
 		vkBridge.send('VKWebAppJoinGroup', { 'group_id': 213140436 });
 	} else if (el === elmPost) {
-		const postText = elmScore.textContent;
+		const postText = elmLvl.textContent;
 		vkBridge.send('VKWebAppShowWallPostBox', {
 			'message': `Мой уровень в игре Game - ${postText}! Сможешь побить?\n\nOrby Games (vk.com/orby.games) - бесплатные игры для ВКонтакте. Присоединяйся!\n\n#игры #vkgames #directgames`,
 			'attachments': 'https://vk.com/app8195384'
