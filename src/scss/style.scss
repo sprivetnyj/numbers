@@ -80,19 +80,17 @@ body {
 .lvl {
 	position: absolute;
 	top: 15px;
-	left: 50%;
+	right: 15px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-width: 200px;
-	min-height: 42px;
-	padding: 0 20px;
-	font-size: 20px;
+	width: 60px;
+	height: 60px;
+	font-size: 30px;
 	color: var(--color-blue);
 	background-color: #fff;
-	transform: translateX(-50%);
-	span {
-		margin-left: 5px;
+	&.hidden {
+		display: none;
 	}
 }
 
@@ -105,7 +103,7 @@ body {
 	display: grid;
 	grid-template-columns: repeat(var(--columns), 1fr);
 	grid-template-rows: repeat(var(--rows), 1fr);
-	transform: translate(-50%, calc(-50% - 9px));
+	transform: translate(-50%, -50%);
 	// .grid__item
 	&__item {
 		position: relative;
@@ -114,6 +112,26 @@ body {
 		align-items: center;
 		font-size: var(--size);
 		background-color: var(--color-white);
+		span {
+			position: absolute;
+			opacity: 0.75;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			animation: visible 1s infinite linear alternate;
+			@keyframes visible {
+				from {
+					color: var(--color-white);
+				}
+				to {
+					color: var(--color-blue);
+				}
+			}
+		}
 		&.start {
 			background-color: var(--color-blue);
 			&:not(.completed) {
@@ -224,19 +242,38 @@ body {
 }
 
 .home {
-	bottom: 15px;
+	top: 15px;
 	left: 15px;
 	background-size: 80%;
 	background-position: top 45% center;
 	background-image: url("../img/home.svg");
 }
 
-.restart {
+.hint {
 	bottom: 15px;
 	right: 15px;
-	// background-size: 70%;
-	// background-position: top 35% center;
-	background-image: url("../img/restart.svg");
+	background-size: 65%;
+	background-image: url("../img/hint.svg");
+	span {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		width: 20px;
+		height: 20px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 50%;
+		background-color: var(--color-purple);
+	}
+}
+
+.back {
+	bottom: 15px;
+	left: 15px;
+	background-size: 60%;
+	background-position: center left 40%;
+	background-image: url("../img/back.svg");
 }
 
 .group {

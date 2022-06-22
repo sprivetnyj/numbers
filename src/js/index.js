@@ -2,12 +2,13 @@
 
 import { audio } from './audio.js';
 import { map } from './maps.js';
+import { paths } from './paths.js';
 
 //================================================================================
 
 const isMobile = { Android: function () { return navigator.userAgent.match(/Android/i); }, BlackBerry: function () { return navigator.userAgent.match(/BlackBerry/i); }, iOS: function () { return navigator.userAgent.match(/iPhone|iPad|iPod/i); }, Opera: function () { return navigator.userAgent.match(/Opera Mini/i); }, Windows: function () { return navigator.userAgent.match(/IEMobile/i); }, any: function () { return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows()); } };
 
-vkBridge.send('VKWebAppInit');
+// vkBridge.send('VKWebAppInit');
 
 //================================================================================
 
@@ -39,9 +40,9 @@ const elmInvite = document.querySelector('.invite');
 const elmVolume = document.querySelector('.volume');
 
 const elmHome = document.querySelector('.home');
-const elmRestart = document.querySelector('.restart');
-
-const elmLvl = document.querySelector('.lvl span');
+const elmLvl = document.querySelector('.lvl');
+const elmBack = document.querySelector('.back');
+const elmHint = document.querySelector('.hint');
 
 const preloader = document.querySelector('.preloader');
 
@@ -75,17 +76,9 @@ preloader.classList.add('hidden');
 // 		})
 // });
 
-const taps = ['Tap1', 'Tap2', 'Tap3', 'Tap4', 'Tap5', 'Tap6', 'Tap7', 'Tap8'];
-
-// a b c d e f g h i j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z
-// 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-const digits = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-
-//================================================================================
-
-// setInterval(() => {
-// 	c.clearRect(0, 0, canvas.width, canvas.height);
-// }, 1000 / 60);
+// a b c d e f g h i j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  0  1  2  3
+// 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+const digits = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3'];
 
 //================================================================================
 
@@ -94,19 +87,26 @@ let lvlComplete = false;
 
 let elmGrid, elmGridItems, elmGridItemsActive;
 
-// Текущая выбранная цифра
-let numbers;
+let numbers, numbersAim, numbersArray;
 let numbersAll = 0;
-// Всего возможных ячеек в сетке
-let numbersAim;
-// Массив всех отмеченных ячеек
-let numbersArray;
+let numbersPaths = [];
+
+let orderEl = [];
+let index;
 
 createLvl(lvl);
 
 function createLvl(number) {
+	orderEl = [];
+
+	if (number >= 55) {
+		index = Math.floor(Math.random() * (55 - 20) + 20);
+	} else {
+		index = number;
+	}
 	elmLvl.textContent = number + 1;
-	const tiles = map[number].replace(/\r?\n/g, '').trim();
+
+	const tiles = map[index].replace(/\r?\n/g, '').trim();
 	let tilesRows = 0;
 
 	for (let tile of tiles) {
@@ -123,6 +123,7 @@ function createLvl(number) {
 		case 3: tilesSize = 40; break;
 		case 4: tilesSize = 30; break;
 		case 5: tilesSize = 20; break;
+		case 6: tilesSize = 16; break;
 	}
 	let tilesHTML = `<div class="grid" style="--columns:${tilesColumns};--rows:${tilesRows};--width:340px;--height:${340 / tilesColumns * tilesRows}px;--size:${tilesSize}px">\n`
 
@@ -159,7 +160,6 @@ function createLvl(number) {
 	elmGridItems.forEach(elmGridItem => {
 		if (!elmGridItem.classList.contains('hidden')) numbersAim++;
 	});
-
 
 	// Разные события, в зависимости от устройства
 	if (isMobile.any()) {
@@ -204,9 +204,37 @@ document.addEventListener('click', (e) => {
 	// 	if (volume) audio.Click.play();
 	// 	newScreen(elmScreenStart);
 	// } 
-	else if (el === elmRestart) {
-		elmGrid.remove();
-		createLvl(lvl);
+	else if (el === elmBack) {
+		if (orderEl.length) {
+			orderEl[orderEl.length - 1].forEach(element => {
+				element.classList.remove('active', 'completed', 'top', 'left', 'right', 'bottom');
+				if (element.classList.contains('start')) element.classList.add('active');
+				if (!element.classList.contains('start') && !element.classList.contains('end')) {
+					element.textContent = '';
+				}
+			});
+			orderEl.splice(orderEl.length - 1, 1);
+			if (!orderEl.length) {
+				elmBack.classList.add('hidden');
+			}
+		}
+	}
+	else if (el.closest('.hint')) {
+		for (let i = 0; i < paths[index].length; i++) {
+			const element = paths[index][i];
+			let hintNumber = 2;
+			for (const elementNumber of element) {
+				if (elmGridItems[elementNumber].classList.contains('active')) {
+					break;
+				} else {
+					if (!elmGridItems[elementNumber].classList.contains('end')) {
+						elmGridItems[elementNumber].insertAdjacentHTML('afterbegin', `<span>${hintNumber}</span>`);
+					}
+					hintNumber++;
+					i++;
+				}
+			}
+		}
 	}
 	else if (el === elmVolume) {
 		volume = !volume;
@@ -267,9 +295,12 @@ function move(e) {
 										document.removeEventListener('mousemove', move);
 									}
 								}
+								if (elmGrid.querySelectorAll('.start').length > 1) {
+									orderEl.push(numbersArray);
+									elmBack.classList.remove('hidden');
+								}
 								setTimeout(() => {
 									if (!lvlComplete) {
-										console.log(true);
 										confetti({
 											particleCount: 50,
 											decay: scale / 2,
@@ -286,9 +317,7 @@ function move(e) {
 									}
 								}, 1);
 							} else {
-								if (numberLock) {
-									out();
-								}
+								if (numberLock) out();
 								numberLock = false;
 							}
 						} else {
@@ -333,44 +362,7 @@ function move(e) {
 					out();
 				}
 			}
-			if (elmGrid.querySelectorAll('.active').length >= numbersAim) {
-				if (!lvlComplete) {
-					toggleClasses([elmHome, elmRestart], 'add', ['hidden']);
-					if (volume) audio.Confetti.play();
-					lvl++;
-					if (lvl < 36) {
-						setTimeout(() => {
-							if (isMobile.any()) {
-								document.removeEventListener('touchmove', move);
-							} else {
-								document.removeEventListener('mousemove', move);
-							}
-							toggleClasses([elmHome, elmRestart], 'remove', ['hidden']);
-							elmGrid.remove();
-							createLvl(lvl);
-							lvlComplete = false;
-						}, 2000);
-					}
-					lvlComplete = true;
-					const colors = ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'];
-					confetti({
-						particleCount: 100,
-						angle: 60,
-						spread: 90,
-						gravity: 1.5,
-						origin: { x: 0, y: 0.6 },
-						colors: colors
-					});
-					confetti({
-						particleCount: 100,
-						angle: 120,
-						spread: 90,
-						gravity: 1.5,
-						origin: { x: 1, y: 0.6 },
-						colors: colors
-					});
-				}
-			}
+			lvlEnd();
 		} else {
 			out();
 		}
@@ -381,7 +373,7 @@ function move(e) {
 
 // Создание новой цифры
 function addNumber() {
-	vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
+	// vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 	// Проверка стороны нового элемента
 	if (currentEl.y > prevEl.y) el.classList.add('top');
 	if (currentEl.y < prevEl.y) el.classList.add('bottom');
@@ -399,9 +391,6 @@ function out() {
 	if (!lvlComplete) {
 		numberLock = true;
 		numbers = 1;
-		// numbersArray.forEach(numberItem => {
-		// 	numberItem.classList.remove('error');
-		// });
 		numbersArray = [];
 		if (isMobile.any()) {
 			document.removeEventListener('touchmove', move);
@@ -419,6 +408,47 @@ function out() {
 				elmGridItem.textContent = '';
 			}
 		});
+	}
+}
+
+//================================================================================
+
+function lvlEnd() {
+	if (elmGrid.querySelectorAll('.active').length >= numbersAim) {
+		if (!lvlComplete) {
+			toggleClasses([elmHome, elmLvl, elmBack, elmHint], 'add', ['hidden']);
+			if (volume) audio.Confetti.play();
+			lvl++;
+			setTimeout(() => {
+				if (isMobile.any()) {
+					document.removeEventListener('touchmove', move);
+				} else {
+					document.removeEventListener('mousemove', move);
+				}
+				toggleClasses([elmHome, elmLvl, elmHint], 'remove', ['hidden']);
+				elmGrid.remove();
+				createLvl(lvl);
+				lvlComplete = false;
+			}, 2000);
+			lvlComplete = true;
+			const colors = ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff'];
+			confetti({
+				particleCount: 100,
+				angle: 60,
+				spread: 90,
+				gravity: 1.5,
+				origin: { x: 0, y: 0.6 },
+				colors: colors
+			});
+			confetti({
+				particleCount: 100,
+				angle: 120,
+				spread: 90,
+				gravity: 1.5,
+				origin: { x: 1, y: 0.6 },
+				colors: colors
+			});
+		}
 	}
 }
 
