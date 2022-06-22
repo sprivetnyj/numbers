@@ -1,5 +1,9 @@
 //================================================================================
 
+const prod = true;
+
+//================================================================================
+
 import { audio } from './audio.js';
 import { map } from './maps.js';
 import { paths } from './paths.js';
@@ -8,7 +12,7 @@ import { paths } from './paths.js';
 
 const isMobile = { Android: function () { return navigator.userAgent.match(/Android/i); }, BlackBerry: function () { return navigator.userAgent.match(/BlackBerry/i); }, iOS: function () { return navigator.userAgent.match(/iPhone|iPad|iPod/i); }, Opera: function () { return navigator.userAgent.match(/Opera Mini/i); }, Windows: function () { return navigator.userAgent.match(/IEMobile/i); }, any: function () { return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows()); } };
 
-// vkBridge.send('VKWebAppInit');
+if (prod) vkBridge.send('VKWebAppInit');
 
 //================================================================================
 
@@ -373,7 +377,7 @@ function move(e) {
 
 // Создание новой цифры
 function addNumber() {
-	// vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
+	if (prod) vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 	// Проверка стороны нового элемента
 	if (currentEl.y > prevEl.y) el.classList.add('top');
 	if (currentEl.y < prevEl.y) el.classList.add('bottom');
