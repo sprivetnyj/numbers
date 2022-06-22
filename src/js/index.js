@@ -56,31 +56,16 @@ let userHelp;
 
 vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1', 'helpKey1'] })
 	.then(data => {
-		console.log(data);
 		if (!data.keys[0].value.length) data.keys[0].value = '0';
 		if (!data.keys[1].value.length) data.keys[1].value = '3';
-		console.log(data);
 		lvl = data.keys[0].value;
 		userHelp = data.keys[1].value;
+		elmLvl.textContent = Number(lvl) + 1;
 		setTimeout(() => {
 			preloader.classList.add('hidden');
 			gameStart();
 		}, 2000);
 	});
-
-// vkBridge.send("VKWebAppCheckNativeAds", { "ad_format": "interstitial" })
-// .then(() => {
-// 	vkBridge.send("VKWebAppShowNativeAds", { "ad_format": "interstitial" })
-// });
-
-// vkBridge.send("VKWebAppCheckNativeAds", { "ad_format": "reward" })
-// .then(() => {
-// 	vkBridge.send("VKWebAppShowNativeAds", { "ad_format": "reward", "use_waterfall": true })
-// 		.then(() => {
-// 		})
-// 		.catch(() => {
-// 		})
-// });
 
 // a b c d e f g h i j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  0  1  2  3
 // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
@@ -129,7 +114,6 @@ function createLvl(number) {
 	} else {
 		index = number;
 	}
-	elmLvl.textContent = number + 1;
 
 	const tiles = map[index].replace(/\r?\n/g, '').trim();
 	let tilesRows = 0;
@@ -248,7 +232,9 @@ document.addEventListener('click', (e) => {
 			} else {
 				helpKey = String(userHelp);
 			}
-			elmHint.firstElementChild = userHelp;
+			console.log(userHelp);
+			console.log(elmHint.firstElementChild);
+			// elmHint.firstElementChild = userHelp;
 
 			vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
 				.then(() => {
@@ -479,6 +465,7 @@ function lvlEnd() {
 			if (volume) audio.Confetti.play();
 			lvl++;
 			setTimeout(() => {
+				elmLvl.textContent = lvl + 1;
 				vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1'] })
 					.then(() => {
 						// Записываем рекорд в ключ хранилища
