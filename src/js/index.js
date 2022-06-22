@@ -1,9 +1,5 @@
 //================================================================================
 
-const prod = true;
-
-//================================================================================
-
 import { audio } from './audio.js';
 import { map } from './maps.js';
 import { paths } from './paths.js';
@@ -12,7 +8,7 @@ import { paths } from './paths.js';
 
 const isMobile = { Android: function () { return navigator.userAgent.match(/Android/i); }, BlackBerry: function () { return navigator.userAgent.match(/BlackBerry/i); }, iOS: function () { return navigator.userAgent.match(/iPhone|iPad|iPod/i); }, Opera: function () { return navigator.userAgent.match(/Opera Mini/i); }, Windows: function () { return navigator.userAgent.match(/IEMobile/i); }, any: function () { return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows()); } };
 
-if (prod) vkBridge.send('VKWebAppInit');
+vkBridge.send('VKWebAppInit');
 
 //================================================================================
 
@@ -35,7 +31,6 @@ const elmWrapper = document.querySelector('.wrapper');
 const elmScreens = document.querySelectorAll('.screen');
 const elmScreenStart = document.querySelector('.screen--start');
 const elmScreenGame = document.querySelector('.screen--game');
-const elmScreenEnd = document.querySelector('.screen--end');
 
 const elmPlay = document.querySelector('.play');
 const elmGroup = document.querySelector('.group');
@@ -54,17 +49,22 @@ const preloader = document.querySelector('.preloader');
 
 let volume = true;
 
-// vkBridge.send('VKWebAppStorageGet', { 'keys': ['key'] })
-// 	.then(data => {
-// 		if (!data.keys[0].value.length) data.keys[0].value = '0';
-// 		lvl = data.keys[0].value;
-// 		setTimeout(() => {
-// 			preloader.classList.add('hidden');
-// 			gameStart();
-// 		}, 2000);
-// 	});
+let ad = -1;
 
-preloader.classList.add('hidden');
+let lvl;
+let userHelp;
+
+vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey0', 'helpKey0'] })
+	.then(data => {
+		if (!data.keys[0].value.length) data.keys[0].value = '0';
+		if (!data.keys[1].value.length) data.keys[0].value = '3';
+		lvl = data.keys[0].value;
+		userHelp = data.keys[1].value;
+		setTimeout(() => {
+			preloader.classList.add('hidden');
+			gameStart();
+		}, 2000);
+	});
 
 // vkBridge.send("VKWebAppCheckNativeAds", { "ad_format": "interstitial" })
 // .then(() => {
@@ -86,7 +86,17 @@ const digits = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
 
 //================================================================================
 
-let lvl = 0;
+function gameStart() {
+	createLvl(lvl);
+	if (userHelp !== 'null') {
+		elmHint.firstElementChild.textContent = userHelp;
+	} else {
+		elmHint.classList.add('show');
+	}
+}
+
+//================================================================================
+
 let lvlComplete = false;
 
 let elmGrid, elmGridItems, elmGridItemsActive;
@@ -97,10 +107,19 @@ let numbersPaths = [];
 
 let orderEl = [];
 let index;
-
-createLvl(lvl);
+let helpKey;
 
 function createLvl(number) {
+	ad++;
+	if (ad > 0) {
+		if (ad % 3 === 0) {
+			vkBridge.send("VKWebAppCheckNativeAds", { "ad_format": "interstitial" })
+				.then(() => {
+					vkBridge.send("VKWebAppShowNativeAds", { "ad_format": "interstitial" })
+				})
+		}
+	}
+
 	orderEl = [];
 
 	if (number >= 55) {
@@ -187,8 +206,6 @@ function createLvl(number) {
 
 //================================================================================
 
-newScreen(elmScreenGame);
-
 document.addEventListener('click', (e) => {
 	const el = e.target;
 	if (el === elmPlay) {
@@ -196,19 +213,16 @@ document.addEventListener('click', (e) => {
 	} else if (el === elmGroup) {
 		vkBridge.send('VKWebAppJoinGroup', { 'group_id': 213140436 });
 	} else if (el === elmPost) {
-		let postText = 10;
+		const postText = elmScore.textContent;
 		vkBridge.send('VKWebAppShowWallPostBox', {
 			'message': `Мой уровень в игре Game - ${postText}! Сможешь побить?\n\nOrby Games (vk.com/orby.games) - бесплатные игры для ВКонтакте. Присоединяйся!\n\n#игры #vkgames #directgames`,
-			'attachments': 'https://vk.com/appID'
+			'attachments': 'https://vk.com/app8195384'
 		})
 	} else if (el === elmInvite) {
 		vkBridge.send('VKWebAppShowInviteBox')
-	}
-	// else if (el === elmHome) {
-	// 	if (volume) audio.Click.play();
-	// 	newScreen(elmScreenStart);
-	// } 
-	else if (el === elmBack) {
+	} else if (el === elmHome) {
+		newScreen(elmScreenStart);
+	} else if (el === elmBack) {
 		if (orderEl.length) {
 			orderEl[orderEl.length - 1].forEach(element => {
 				element.classList.remove('active', 'completed', 'top', 'left', 'right', 'bottom');
@@ -222,28 +236,67 @@ document.addEventListener('click', (e) => {
 				elmBack.classList.add('hidden');
 			}
 		}
-	}
-	else if (el.closest('.hint')) {
-		for (let i = 0; i < paths[index].length; i++) {
-			const element = paths[index][i];
-			let hintNumber = 2;
-			for (const elementNumber of element) {
-				if (elmGridItems[elementNumber].classList.contains('active')) {
-					break;
-				} else {
-					if (!elmGridItems[elementNumber].classList.contains('end')) {
-						elmGridItems[elementNumber].insertAdjacentHTML('afterbegin', `<span>${hintNumber}</span>`);
+	} else if (el.closest('.hint')) {
+		if (userHelp !== 'null') {
+			userHelp--;
+			if (userHelp < 1) {
+				elmHint.classList.add('show');
+				userHelp = 'null';
+				helpKey = userHelp;
+			} else {
+				helpKey = String(userHelp);
+			}
+			elmHint.firstElementChild = userHelp;
+
+			vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey0'] })
+				.then(() => {
+					// Записываем подсказки в ключ хранилища
+					vkBridge.send('VKWebAppStorageSet', { key: 'helpKey0', value: helpKey });
+				});
+
+			for (let i = 0; i < paths[index].length; i++) {
+				const element = paths[index][i];
+				let hintNumber = 2;
+				for (const elementNumber of element) {
+					if (elmGridItems[elementNumber].classList.contains('active')) {
+						break;
+					} else {
+						if (!elmGridItems[elementNumber].classList.contains('end')) {
+							elmGridItems[elementNumber].insertAdjacentHTML('afterbegin', `<span>${hintNumber}</span>`);
+						}
+						hintNumber++;
+						i++;
 					}
-					hintNumber++;
-					i++;
 				}
 			}
+		} else {
+			// Показ рекламы + показ экрана конца игры
+			vkBridge.send("VKWebAppCheckNativeAds", { "ad_format": "reward" })
+				.then(() => {
+					vkBridge.send("VKWebAppShowNativeAds", { "ad_format": "reward", "use_waterfall": true })
+						.then(() => {
+							userHelp = 3;
+
+							vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey0'] })
+								.then(() => {
+									// Записываем подсказки в ключ хранилища
+									vkBridge.send('VKWebAppStorageSet', { key: 'helpKey0', value: String(userHelp) });
+								})
+
+							toggleClasses([elmHint], 'remove', ['show', 'error'], 0);
+							elmHint.firstElementChild = userHelp;
+						})
+						.catch(() => {
+							elmHint.classList.add('error');
+							elmHint.firstElementChild = userHelp;
+						})
+				})
 		}
 	}
-	else if (el === elmVolume) {
-		volume = !volume;
-		elmVolume.classList.toggle('off');
-	}
+	// else if (el === elmVolume) {
+	// 	volume = !volume;
+	// 	elmVolume.classList.toggle('off');
+	// }
 	if (el.closest('button')) {
 		animState([el.closest('button')], 200, 'scale');
 		if (volume) audio.Click.play();
@@ -377,7 +430,7 @@ function move(e) {
 
 // Создание новой цифры
 function addNumber() {
-	if (prod) vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
+	vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 	// Проверка стороны нового элемента
 	if (currentEl.y > prevEl.y) el.classList.add('top');
 	if (currentEl.y < prevEl.y) el.classList.add('bottom');
@@ -424,6 +477,11 @@ function lvlEnd() {
 			if (volume) audio.Confetti.play();
 			lvl++;
 			setTimeout(() => {
+				vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey0'] })
+					.then(() => {
+						// Записываем рекорд в ключ хранилища
+						vkBridge.send('VKWebAppStorageSet', { key: 'lvlKey0', value: String(lvl) });
+					});
 				if (isMobile.any()) {
 					document.removeEventListener('touchmove', move);
 				} else {
@@ -478,11 +536,9 @@ function newScreen(newScreen) {
 			newScreenSide = 'hidden--left';
 		}
 		if (!screen.classList.contains('hidden')) {
-			// toggleClasses([screen], 'add', ['hidden', oldScreenSide], 500);
-			toggleClasses([screen], 'add', ['hidden', oldScreenSide], 0);
+			toggleClasses([screen], 'add', ['hidden', oldScreenSide], 500);
 		} else if (screen === newScreen) {
-			// toggleClasses([screen], 'remove', ['hidden', newScreenSide], 500);
-			toggleClasses([screen], 'remove', ['hidden', newScreenSide], 0);
+			toggleClasses([screen], 'remove', ['hidden', newScreenSide], 500);
 		}
 	});
 }
@@ -501,18 +557,6 @@ function toggleClasses(elements, state, classArray, delay = 0) {
 			});
 		});
 	}, delay);
-}
-
-//================================================================================
-
-function getNoun(number) {
-	let n = Math.abs(number);
-	n %= 100;
-	if (n >= 5 && n <= 20) return 'подсказок';
-	n %= 10;
-	if (n === 1) return 'подсказка';
-	if (n >= 2 && n <= 4) return 'подсказки';
-	return 'подсказок';
 }
 
 //================================================================================
