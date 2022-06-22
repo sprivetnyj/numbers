@@ -232,9 +232,7 @@ document.addEventListener('click', (e) => {
 			} else {
 				helpKey = String(userHelp);
 			}
-			console.log(userHelp);
-			console.log(elmHint.firstElementChild);
-			// elmHint.firstElementChild = userHelp;
+			elmHint.firstElementChild.textContent = userHelp;
 
 			vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
 				.then(() => {
@@ -267,16 +265,15 @@ document.addEventListener('click', (e) => {
 
 							vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
 								.then(() => {
-									// Записываем подсказки в ключ хранилища
 									vkBridge.send('VKWebAppStorageSet', { key: 'helpKey1', value: String(userHelp) });
 								})
 
 							toggleClasses([elmHint], 'remove', ['show', 'error'], 0);
-							elmHint.firstElementChild = userHelp;
+							elmHint.firstElementChild.textContent = userHelp;
 						})
 						.catch(() => {
 							elmHint.classList.add('error');
-							elmHint.firstElementChild = userHelp;
+							elmHint.firstElementChild.textContent = userHelp;
 						})
 				})
 		}
