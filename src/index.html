@@ -18,11 +18,22 @@
 		<div class="wrapper">
 			<canvas></canvas>
 			<div class="screen screen--start">
+				<button class="settings icon"></button>
 				<button class="play"></button>
 				<button class="group icon"></button>
 				<button class="invite icon"></button>
 				<button class="post icon"></button>
-				<button class="volume icon"></button>
+				<div class="settings-menu hidden">
+					<div class="settings-item">
+						<div class="settings-text">Звук</div>
+						<input class="settings-toggle" type="checkbox" id="sound" checked>
+					</div>
+					<div class="settings-item">
+						<div class="settings-text">Вибрация</div>
+						<input class="settings-toggle" type="checkbox" id="vibration" checked>
+					</div>
+					<button class="close icon"></button>
+				</div>
 			</div>
 			<div class="screen screen--game hidden hidden--right">
 				<button class="home icon"></button>

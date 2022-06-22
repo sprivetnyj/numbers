@@ -36,7 +36,12 @@ const elmPlay = document.querySelector('.play');
 const elmGroup = document.querySelector('.group');
 const elmPost = document.querySelector('.post');
 const elmInvite = document.querySelector('.invite');
-const elmVolume = document.querySelector('.volume');
+
+const elmSettings = document.querySelector('.settings');
+const elmSettingsMenu = document.querySelector('.settings-menu');
+const elmClose = document.querySelector('.close');
+const elmSound = document.querySelector('#sound');
+const elmVibration = document.querySelector('#vibration');
 
 const elmHome = document.querySelector('.home');
 const elmLvl = document.querySelector('.lvl');
@@ -47,25 +52,44 @@ const preloader = document.querySelector('.preloader');
 
 //================================================================================
 
-let volume = true;
+let sound, vibration;
 
 let ad = -1;
 
 let lvl;
 let userHelp;
 
-vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1', 'helpKey1'] })
+vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1', 'helpKey1', 'soundKey0', 'vibrationKey0'] })
 	.then(data => {
 		if (!data.keys[0].value.length) data.keys[0].value = '0';
 		if (!data.keys[1].value.length) data.keys[1].value = '3';
+		if (!data.keys[2].value.length) data.keys[2].value = 'true';
+		if (!data.keys[3].value.length) data.keys[3].value = 'true';
+
 		lvl = data.keys[0].value;
 		userHelp = data.keys[1].value;
 		elmLvl.textContent = Number(lvl) + 1;
+
+		sound = data.keys[2].value;
+		vibration = data.keys[3].value;
+
+		if (sound === 'true') {
+			elmSound.checked = true;
+		} else {
+			elmSound.checked = false;
+		}
+		if (vibration === 'true') {
+			elmVibration.checked = true;
+		} else {
+			elmVibration.checked = false;
+		}
 		setTimeout(() => {
 			preloader.classList.add('hidden');
 			gameStart();
 		}, 2000);
 	});
+
+preloader.classList.add('hidden');
 
 // a b c d e f g h i j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  0  1  2  3
 // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
@@ -194,6 +218,10 @@ function createLvl(number) {
 
 document.addEventListener('click', (e) => {
 	const el = e.target;
+	if (el.closest('button')) {
+		animState([el.closest('button')], 200, 'scale');
+		if (sound === 'true') audio.Click.play();
+	}
 	if (el === elmPlay) {
 		newScreen(elmScreenGame);
 	} else if (el === elmGroup) {
@@ -208,7 +236,26 @@ document.addEventListener('click', (e) => {
 		vkBridge.send('VKWebAppShowInviteBox')
 	} else if (el === elmHome) {
 		newScreen(elmScreenStart);
-	} else if (el === elmBack) {
+	} else if (el === elmSettings) {
+		elmSettingsMenu.classList.remove('hidden');
+	} else if (el === elmClose) {
+		elmSettingsMenu.classList.add('hidden');
+	} else if (el === elmSound) {
+		sound = elmSound.checked;
+		if (sound === 'true') audio.Click.play();
+		vkBridge.send('VKWebAppStorageGet', { 'keys': ['soundKey0'] })
+			.then(() => {
+				vkBridge.send('VKWebAppStorageSet', { key: 'soundKey0', value: sound });
+			});
+	} else if (el === elmVibration) {
+		vibration = elmVibration.checked;
+		if (sound === 'true') audio.Click.play();
+		vkBridge.send('VKWebAppStorageGet', { 'keys': ['vibrationKey0'] })
+			.then(() => {
+				vkBridge.send('VKWebAppStorageSet', { key: 'vibrationKey0', value: vibration });
+			});
+	}
+	else if (el === elmBack) {
 		if (orderEl.length) {
 			orderEl[orderEl.length - 1].forEach(element => {
 				element.classList.remove('active', 'completed', 'top', 'left', 'right', 'bottom');
@@ -266,7 +313,7 @@ document.addEventListener('click', (e) => {
 							vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
 								.then(() => {
 									vkBridge.send('VKWebAppStorageSet', { key: 'helpKey1', value: String(userHelp) });
-								})
+								});
 
 							toggleClasses([elmHint], 'remove', ['show', 'error'], 0);
 							elmHint.firstElementChild.textContent = userHelp;
@@ -277,14 +324,6 @@ document.addEventListener('click', (e) => {
 						})
 				})
 		}
-	}
-	// else if (el === elmVolume) {
-	// 	volume = !volume;
-	// 	elmVolume.classList.toggle('off');
-	// }
-	if (el.closest('button')) {
-		animState([el.closest('button')], 200, 'scale');
-		if (volume) audio.Click.play();
 	}
 });
 
@@ -415,7 +454,7 @@ function move(e) {
 
 // Создание новой цифры
 function addNumber() {
-	vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
+	if (vibration === 'true') vkBridge.send("VKWebAppTapticImpactOccurred", { "style": "light" });
 	// Проверка стороны нового элемента
 	if (currentEl.y > prevEl.y) el.classList.add('top');
 	if (currentEl.y < prevEl.y) el.classList.add('bottom');
@@ -459,7 +498,7 @@ function lvlEnd() {
 	if (elmGrid.querySelectorAll('.active').length >= numbersAim) {
 		if (!lvlComplete) {
 			toggleClasses([elmHome, elmLvl, elmBack, elmHint], 'add', ['hidden']);
-			if (volume) audio.Confetti.play();
+			if (sound === 'true') audio.Confetti.play();
 			lvl++;
 			setTimeout(() => {
 				elmLvl.textContent = lvl + 1;

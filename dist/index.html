@@ -7,9 +7,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap&_v=20220622120935" rel="stylesheet">
-	<link rel="stylesheet" href="./css/style.min.css?_v=20220622120935">
-	<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js?_v=20220622120935"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap&_v=20220622134626" rel="stylesheet">
+	<link rel="stylesheet" href="./css/style.min.css?_v=20220622134626">
+	<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js?_v=20220622134626"></script>
 	<title>Game</title>
 </head>
 
@@ -18,11 +18,22 @@
 		<div class="wrapper">
 			<canvas></canvas>
 			<div class="screen screen--start">
+				<button class="settings icon"></button>
 				<button class="play"></button>
 				<button class="group icon"></button>
 				<button class="invite icon"></button>
 				<button class="post icon"></button>
-				<button class="volume icon"></button>
+				<div class="settings-menu hidden">
+					<div class="settings-item">
+						<div class="settings-text">Звук</div>
+						<input class="settings-toggle" type="checkbox" id="sound" checked>
+					</div>
+					<div class="settings-item">
+						<div class="settings-text">Вибрация</div>
+						<input class="settings-toggle" type="checkbox" id="vibration" checked>
+					</div>
+					<button class="close icon"></button>
+				</div>
 			</div>
 			<div class="screen screen--game hidden hidden--right">
 				<button class="home icon"></button>
@@ -37,9 +48,9 @@
 	<div class="preloader">
 		<div class="spinner"></div>
 	</div>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js?_v=20220622120935" integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js?_v=20220622120935"></script>
-	<script src="./js/index.min.js?_v=20220622120935"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js?_v=20220622134626" integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js?_v=20220622134626"></script>
+	<script src="./js/index.min.js?_v=20220622134626"></script>
 </body>
 
 </html>
