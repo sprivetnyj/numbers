@@ -227,7 +227,7 @@ document.addEventListener('click', (e) => {
 	} else if (el === elmPost) {
 		const postText = elmLvl.textContent;
 		vkBridge.send('VKWebAppShowWallPostBox', {
-			'message': `Мой уровень в игре Game - ${postText}! Сможешь побить?\n\nOrby Games (vk.com/orby.games) - бесплатные игры для ВКонтакте. Присоединяйся!\n\n#игры #vkgames #directgames`,
+			'message': `Мой уровень в игре Лабиринт Чисел 🎲 - ${postText}! Сможешь побить?\n\nOrby Games (vk.com/orby.games) - бесплатные игры для ВКонтакте. Присоединяйся!\n\n#игры #vkgames #directgames #головоломки #puzzle`,
 			'attachments': 'https://vk.com/app8195384'
 		})
 	} else if (el === elmInvite) {
