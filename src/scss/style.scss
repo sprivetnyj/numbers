@@ -266,13 +266,13 @@ body {
 		border-radius: 50%;
 		background-color: var(--color-purple);
 	}
-	.show {
+	&.show {
 		background-image: url("../img/reward.svg");
 		span {
 			display: none;
 		}
 	}
-	.error {
+	&.error {
 		background-color: #999;
 		span {
 			display: none;
