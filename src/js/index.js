@@ -241,14 +241,14 @@ document.addEventListener('click', (e) => {
 	} else if (el === elmClose) {
 		elmSettingsMenu.classList.add('hidden');
 	} else if (el === elmSound) {
-		sound = elmSound.checked;
+		sound = String(elmSound.checked);
 		if (sound === 'true') audio.Click.play();
 		vkBridge.send('VKWebAppStorageGet', { 'keys': ['soundKey0'] })
 			.then(() => {
 				vkBridge.send('VKWebAppStorageSet', { key: 'soundKey0', value: sound });
 			});
 	} else if (el === elmVibration) {
-		vibration = elmVibration.checked;
+		vibration = String(elmVibration.checked);
 		if (sound === 'true') audio.Click.play();
 		vkBridge.send('VKWebAppStorageGet', { 'keys': ['vibrationKey0'] })
 			.then(() => {
