@@ -59,7 +59,7 @@ let ad = -1;
 let lvl;
 let userHelp;
 
-vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1', 'helpKey1', 'soundKey0', 'vibrationKey0'] })
+vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey2', 'helpKey2', 'soundKey1', 'vibrationKey1'] })
 	.then(data => {
 		if (!data.keys[0].value.length) data.keys[0].value = '0';
 		if (!data.keys[1].value.length) data.keys[1].value = '3';
@@ -241,16 +241,16 @@ document.addEventListener('click', (e) => {
 	} else if (el === elmSound) {
 		sound = String(elmSound.checked);
 		if (sound === 'true') audio.Click.play();
-		vkBridge.send('VKWebAppStorageGet', { 'keys': ['soundKey0'] })
+		vkBridge.send('VKWebAppStorageGet', { 'keys': ['soundKey1'] })
 			.then(() => {
-				vkBridge.send('VKWebAppStorageSet', { key: 'soundKey0', value: sound });
+				vkBridge.send('VKWebAppStorageSet', { key: 'soundKey1', value: sound });
 			});
 	} else if (el === elmVibration) {
 		vibration = String(elmVibration.checked);
 		if (sound === 'true') audio.Click.play();
-		vkBridge.send('VKWebAppStorageGet', { 'keys': ['vibrationKey0'] })
+		vkBridge.send('VKWebAppStorageGet', { 'keys': ['vibrationKey1'] })
 			.then(() => {
-				vkBridge.send('VKWebAppStorageSet', { key: 'vibrationKey0', value: vibration });
+				vkBridge.send('VKWebAppStorageSet', { key: 'vibrationKey1', value: vibration });
 			});
 	}
 	else if (el === elmBack) {
@@ -279,10 +279,10 @@ document.addEventListener('click', (e) => {
 			}
 			elmHint.firstElementChild.textContent = userHelp;
 
-			vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
+			vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey2'] })
 				.then(() => {
 					// Записываем подсказки в ключ хранилища
-					vkBridge.send('VKWebAppStorageSet', { key: 'helpKey1', value: helpKey });
+					vkBridge.send('VKWebAppStorageSet', { key: 'helpKey2', value: helpKey });
 				});
 
 			for (let i = 0; i < paths[index].length; i++) {
@@ -308,9 +308,9 @@ document.addEventListener('click', (e) => {
 						.then(() => {
 							userHelp = 3;
 
-							vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey1'] })
+							vkBridge.send('VKWebAppStorageGet', { 'keys': ['helpKey2'] })
 								.then(() => {
-									vkBridge.send('VKWebAppStorageSet', { key: 'helpKey1', value: String(userHelp) });
+									vkBridge.send('VKWebAppStorageSet', { key: 'helpKey2', value: String(userHelp) });
 								});
 
 							toggleClasses([elmHint], 'remove', ['show', 'error'], 0);
@@ -500,10 +500,10 @@ function lvlEnd() {
 			lvl++;
 			setTimeout(() => {
 				elmLvl.textContent = lvl + 1;
-				vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey1'] })
+				vkBridge.send('VKWebAppStorageGet', { 'keys': ['lvlKey2'] })
 					.then(() => {
 						// Записываем рекорд в ключ хранилища
-						vkBridge.send('VKWebAppStorageSet', { key: 'lvlKey1', value: String(lvl) });
+						vkBridge.send('VKWebAppStorageSet', { key: 'lvlKey2', value: String(lvl) });
 					});
 				if (isMobile.any()) {
 					document.removeEventListener('touchmove', move);
